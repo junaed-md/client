@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   ArrowLeft, Printer, Truck, Save, X, Plus, Trash2,
-  MapPin, User, Edit3, Package, CheckCircle // <--- ADD THIS
+  MapPin, User, Edit3, CheckCircle, Package 
 } from 'lucide-react';
 
 export default function OrderDetails() {
@@ -46,14 +46,14 @@ export default function OrderDetails() {
 
   // --- ACTIONS ---
 
-  // 1. Status Update (Quick Action)
+  // 1. Status Update
   const handleStatusChange = async (newStatus) => {
     if(!window.confirm(`Change status to ${newStatus}?`)) return;
     setUpdating(true);
     try {
       await axios.put(`${API_URL}/orders/${id}`, { status: newStatus });
       setOrder({ ...order, status: newStatus });
-      setEditForm({ ...editForm, status: newStatus }); // Sync edit form
+      setEditForm({ ...editForm, status: newStatus });
       alert("Status Updated!");
     } catch (error) {
       alert("Failed to update status");
@@ -130,9 +130,7 @@ export default function OrderDetails() {
   return (
     <div className="max-w-5xl mx-auto pb-20">
       
-      {/* -----------------------------------------------------------
-          HEADER ACTIONS (Back, Status, Edit, Print)
-      ----------------------------------------------------------- */}
+      {/* HEADER ACTIONS */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 print:hidden">
         <button onClick={() => navigate('/admin/orders')} className="flex items-center gap-2 text-gray-500 hover:text-green-600">
           <ArrowLeft className="w-5 h-5" /> Back
@@ -150,7 +148,6 @@ export default function OrderDetails() {
                 </>
             ) : (
                 <>
-                    {/* STATUS DROPDOWN (Restored!) */}
                     <select 
                         className="px-4 py-2 border rounded-lg bg-white font-bold text-gray-700 cursor-pointer focus:ring-2 focus:ring-green-500 outline-none"
                         value={order.status}
@@ -176,30 +173,49 @@ export default function OrderDetails() {
         </div>
       </div>
 
-      {/* -----------------------------------------------------------
-          COURIER MANAGEMENT (Restored!)
-          Only visible if NOT editing and NOT cancelled
-      ----------------------------------------------------------- */}
+      {/* COURIER MANAGEMENT (Updated for Dual IDs) */}
       {!isEditing && order.status !== 'Cancelled' && (
           <div className="bg-white border border-blue-100 p-6 rounded-xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm print:hidden">
-              <div>
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2">
+              <div className="w-full">
+                  <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-2">
                       <Truck className="w-5 h-5 text-blue-600" /> Courier Management
                   </h3>
+                  
                   {order.trackingCode ? (
-                      <p className="text-sm text-green-600 mt-1 flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4" />
-                          Shipped via <strong>{order.courier}</strong> 
-                          <span className="text-gray-400">|</span> 
-                          Tracking: <span className="font-mono bg-gray-100 px-2 rounded">{order.trackingCode}</span>
-                      </p>
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                          <div className="flex items-center gap-2 mb-2">
+                              <CheckCircle className="w-5 h-5 text-green-600" />
+                              <span className="font-bold text-gray-800">Shipped via {order.courier}</span>
+                          </div>
+
+                          {/* 1. TRACKING CODE (Clickable) */}
+                          <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs text-gray-500 uppercase font-bold">Tracking Code</span>
+                              <a 
+                                  href={`https://steadfast.com.bd/t/${order.trackingCode}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-mono font-bold text-blue-700 hover:underline flex items-center gap-1"
+                              >
+                                  {order.trackingCode} ↗
+                              </a>
+                          </div>
+
+                          {/* 2. CONSIGNMENT ID (Reference Only) */}
+                          {order.consignmentId && (
+                              <div className="flex justify-between items-center border-t border-blue-200 pt-1 mt-1">
+                                  <span className="text-xs text-gray-500 uppercase font-bold">Consignment ID</span>
+                                  <span className="text-sm font-mono text-gray-700">{order.consignmentId}</span>
+                              </div>
+                          )}
+                      </div>
                   ) : (
                       <p className="text-sm text-gray-500 mt-1">Ready to ship? Send to courier instantly.</p>
                   )}
               </div>
               
               {!order.trackingCode && (
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 shrink-0">
                       <button onClick={() => sendToCourier('pathao')} disabled={updating} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold shadow-sm transition text-sm">
                           Send to Pathao
                       </button>
@@ -211,9 +227,7 @@ export default function OrderDetails() {
           </div>
       )}
 
-      {/* -----------------------------------------------------------
-          MAIN INVOICE AREA (Editable)
-      ----------------------------------------------------------- */}
+      {/* MAIN INVOICE AREA */}
       <div className={`bg-white p-8 rounded-xl shadow-sm border ${isEditing ? 'border-blue-300 ring-2 ring-blue-50' : 'border-gray-100'}`} id="invoice">
         
         {/* Invoice Header */}
@@ -246,15 +260,15 @@ export default function OrderDetails() {
                         </>
                     ) : (
                         <>
-                            <p className="font-bold text-gray-800">{order.customer.name}</p>
-                            <p className="text-gray-600">{order.customer.phone}</p>
-                            <p className="text-gray-600">{order.customer.address}</p>
+                            <p className="font-bold text-gray-800">{order.customer?.name}</p>
+                            <p className="text-gray-600">{order.customer?.phone}</p>
+                            <p className="text-gray-600">{order.customer?.address}</p>
                         </>
                     )}
                 </div>
             </div>
             
-            {/* Upsell Box (Only in Edit Mode) */}
+            {/* Upsell Box (Edit Only) */}
             {isEditing && (
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                     <h3 className="text-xs font-bold text-blue-600 uppercase mb-3 flex items-center gap-2">

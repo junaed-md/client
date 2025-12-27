@@ -14,21 +14,21 @@ import Home from './pages/public/Home';
 import ProductDetails from './pages/public/ProductDetails';
 import Cart from './pages/public/Cart';
 import Checkout from './pages/public/Checkout';
+import OrderTracking from './pages/OrderTracking'; // <--- NEW IMPORT
 import Login from './pages/auth/Login';
-import Register from './pages/auth/Register'; // (Optional if you have it)
+import Register from './pages/auth/Register';
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
 import OrderList from './pages/admin/orders/OrderList';
 import OrderDetails from './pages/admin/orders/OrderDetails';
-import ProductList from './pages/admin/products/ProductList'; // (We will build this next)
-import ProductForm from './pages/admin/products/ProductForm'; // (We will build this next)
-import CategoryBrand from './pages/admin/products/CategoryBrand'; // <-- NEW PAGE
+import ProductList from './pages/admin/products/ProductList';
+import ProductForm from './pages/admin/products/ProductForm';
+import CategoryBrand from './pages/admin/products/CategoryBrand';
 import Banners from './pages/admin/banners/Banners';
 import Settings from './pages/admin/settings/Settings';
 
 // --- PROTECTED ROUTE COMPONENT ---
-// This ensures only logged-in Admins can access /admin routes
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
@@ -45,7 +45,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           
-          {/* Toast Notifications (Optional but recommended) */}
+          {/* Toast Notifications */}
           <Toaster position="top-center" />
 
           <Routes>
@@ -58,6 +58,7 @@ export default function App() {
               <Route path="product/:id" element={<ProductDetails />} />
               <Route path="cart" element={<Cart />} />
               <Route path="checkout" element={<Checkout />} />
+              <Route path="track" element={<OrderTracking />} /> {/* <--- NEW ROUTE */}
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
@@ -82,7 +83,7 @@ export default function App() {
               <Route path="products/new" element={<ProductForm />} />
               <Route path="products/edit/:id" element={<ProductForm />} />
               
-              {/* NEW: Categories & Brands */}
+              {/* Categories & Brands */}
               <Route path="categories" element={<CategoryBrand />} />
 
               {/* Marketing & Config */}

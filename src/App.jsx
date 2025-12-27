@@ -14,9 +14,9 @@ import Home from './pages/public/Home';
 import ProductDetails from './pages/public/ProductDetails';
 import Cart from './pages/public/Cart';
 import Checkout from './pages/public/Checkout';
-import OrderTracking from './pages/OrderTracking'; // <--- NEW IMPORT
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
+import OrderTracking from './pages/OrderTracking'; // Ensure this matches your file location
+import Login from './pages/public/Login';       // <--- FIXED: Pointing to public folder
+import Register from './pages/public/Register'; // <--- FIXED: Pointing to public folder
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
@@ -27,6 +27,7 @@ import ProductForm from './pages/admin/products/ProductForm';
 import CategoryBrand from './pages/admin/products/CategoryBrand';
 import Banners from './pages/admin/banners/Banners';
 import Settings from './pages/admin/settings/Settings';
+// import CourierCheck from './pages/admin/courier/CourierCheck'; // Add if you have it
 
 // --- PROTECTED ROUTE COMPONENT ---
 const AdminRoute = ({ children }) => {
@@ -58,7 +59,7 @@ export default function App() {
               <Route path="product/:id" element={<ProductDetails />} />
               <Route path="cart" element={<Cart />} />
               <Route path="checkout" element={<Checkout />} />
-              <Route path="track" element={<OrderTracking />} /> {/* <--- NEW ROUTE */}
+              <Route path="track" element={<OrderTracking />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
@@ -89,6 +90,9 @@ export default function App() {
               {/* Marketing & Config */}
               <Route path="banners" element={<Banners />} />
               <Route path="settings" element={<Settings />} />
+              
+              {/* Courier (Optional if you have it) */}
+              <Route path="courier" element={<CourierCheck />} />
             </Route>
 
             {/* 404 Not Found */}
